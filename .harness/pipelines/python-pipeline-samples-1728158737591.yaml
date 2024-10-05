@@ -40,20 +40,83 @@ pipeline:
                   timeout: ""
                   type: Run
               - step:
+                  type: Run
+                  name: Run_3
+                  identifier: Run_3
+                  spec:
+                    connectorRef: account.harnessImage
+                    image: pyhon:3.10.6-alpine
+                    shell: Sh
+                    command: python -m compileall ./
+                  description: code compile
+              - step:
+                  type: Run
+                  name: create docker file
+                  identifier: create_docker_file
+                  spec:
+                    connectorRef: account.harnessImage
+                    image: alpine
+                    shell: Sh
+                    command: |-
+                      touch pythondockerfile
+                      cat > pythondockerfile <<- EOM
+                      FROM python:3.10.6-alpine
+                      WORKDIR /python-pipeline-samples
+                      ADD . /python-pipeline-samples
+                      RUN pip install -r requirements.txt
+                      CMD ["python" , "app.py"]
+                      EOM
+                      cat pythondockerfile
+              - step:
                   identifier: dockerbuild
                   name: docker_build
                   spec:
-                    caching: true
                     connectorRef: <+input>
-                    repo: hello/world
+                    repo: 04071987/harness
                     tags:
                       - latest
+                    caching: true
+                    dockerfile: pythondockerfile
                   timeout: ""
                   type: BuildAndPushDockerRegistry
           platform:
-            arch: Amd64
             os: Linux
+            arch: Amd64
           runtime:
-            spec: {}
             type: Cloud
+            spec: {}
         type: CI
+        description: ""
+    - stage:
+        name: integration-test
+        identifier: integrationtest
+        description: ""
+        type: CI
+        spec:
+          cloneCodebase: false
+          platform:
+            os: Linux
+            arch: Amd64
+          runtime:
+            type: Cloud
+            spec: {}
+          execution:
+            steps:
+              - step:
+                  type: Background
+                  name: python server
+                  identifier: python_server
+                  spec:
+                    connectorRef: account.harnessImage
+                    image: 04071987/harness
+                    shell: Sh
+                    command: python3 /python-pipeline-samples/app.py
+              - step:
+                  type: Run
+                  name: test connection
+                  identifier: test_connection
+                  spec:
+                    connectorRef: account.harnessImage
+                    image: curlimage/curl:7.73.0
+                    shell: Sh
+                    command: curl localhost:5000
