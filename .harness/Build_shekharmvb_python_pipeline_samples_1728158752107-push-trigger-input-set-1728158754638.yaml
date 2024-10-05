@@ -1,0 +1,14 @@
+inputSet:
+  name: Build_shekharmvb_python_pipeline_samples_1728158752107-push-trigger-input-set
+  identifier: Build_shekharmvb_python_pipeline_samples_1728158752107pushtriggerinputset
+  orgIdentifier: default
+  projectIdentifier: pythondemo
+  pipeline:
+    identifier: Build_shekharmvb_python_pipeline_samples_1728158752107
+    properties:
+      ci:
+        codebase:
+          build:
+            type: branch
+            spec:
+              branch: <+trigger.branch>
