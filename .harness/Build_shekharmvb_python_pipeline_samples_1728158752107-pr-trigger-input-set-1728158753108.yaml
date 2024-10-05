@@ -1,0 +1,14 @@
+inputSet:
+  name: Build_shekharmvb_python_pipeline_samples_1728158752107-pr-trigger-input-set
+  identifier: Build_shekharmvb_python_pipeline_samples_1728158752107prtriggerinputset
+  orgIdentifier: default
+  projectIdentifier: pythondemo
+  pipeline:
+    identifier: Build_shekharmvb_python_pipeline_samples_1728158752107
+    properties:
+      ci:
+        codebase:
+          build:
+            type: PR
+            spec:
+              number: <+trigger.prNumber>
